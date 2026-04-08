@@ -150,28 +150,26 @@ var runsTailCmd = &cobra.Command{
 		c := newClient()
 		svc := &api.RunService{Client: c}
 
-		// Get the run to find agent_id
+		// Get the run to find agent_id and status
 		run, err := svc.Get(id)
 		if err != nil {
 			return err
 		}
 
-		// Print existing events first
-		events, err := svc.Events(id)
-		if err != nil {
-			return err
-		}
-
-		for _, e := range events {
-			printTailEvent(e.InsertedAt.Format("15:04:05"), e.EventType, eventSummary(e))
-		}
-
-		// If run is already terminal, we're done
+		// For terminal runs, just print existing events and exit
 		if run.Status == "completed" || run.Status == "failed" {
+			events, err := svc.Events(id)
+			if err != nil {
+				return err
+			}
+			for _, e := range events {
+				printTailEvent(e.InsertedAt.Format("15:04:05"), e.EventType, eventSummary(e))
+			}
 			return nil
 		}
 
-		// Stream new events via WebSocket
+		// For in-progress runs, stream via WebSocket only (no REST fetch
+		// to avoid duplicates between REST snapshot and live events)
 		url := apiURL
 		if url == "" {
 			url = os.Getenv("NORNS_URL")
