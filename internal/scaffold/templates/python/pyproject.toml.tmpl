@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "{{.Name}}"
+version = "0.1.0"
+description = "Agent worker for Norns"
+requires-python = ">=3.10"
+dependencies = [
+    "norns-sdk",
+    "anthropic>=0.40",
+]
+
+[project.scripts]
+{{.Name}}-worker = "{{.PackageName}}:main"

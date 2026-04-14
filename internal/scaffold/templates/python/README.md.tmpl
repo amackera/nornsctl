@@ -1,0 +1,41 @@
+# {{.Name}}
+
+An agent worker for [Norns](https://github.com/amackera/norns).
+
+## Setup
+
+Install dependencies:
+
+```bash
+uv sync
+```
+
+Configure environment:
+
+```bash
+cp .env.example .env
+# Fill in NORNS_URL, NORNS_API_KEY, and ANTHROPIC_API_KEY
+```
+
+Or if you have `nornsctl dev` running, `.env` is already configured.
+
+## Run
+
+```bash
+uv run {{.Name}}-worker
+```
+
+## Adding tools
+
+Define tools in `{{.PackageName}}/tools/` using the `@tool` decorator:
+
+```python
+from norns import tool
+
+@tool
+def my_tool(query: str) -> str:
+    """Description shown to the LLM."""
+    return f"Result for {query}"
+```
+
+Then add it to the `all_tools` list in `{{.PackageName}}/tools/__init__.py`.

@@ -1,0 +1,26 @@
+import logging
+
+from norns import Agent, Norns
+
+from {{.PackageName}} import config
+from {{.PackageName}}.tools import all_tools
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
+
+agent = Agent(
+    name="{{.Name}}",
+    model="claude-sonnet-4-20250514",
+    system_prompt="You are a helpful assistant.",
+    tools=all_tools,
+    mode="conversation",
+    max_steps=20,
+)
+
+
+def main():
+    norns = Norns(config.NORNS_URL, api_key=config.NORNS_API_KEY)
+    norns.run(agent)
+
+
+if __name__ == "__main__":
+    main()
