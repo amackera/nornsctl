@@ -1,0 +1,10 @@
+"""Send a message to the {{.Name}} agent."""
+
+from norns import Norns
+
+from {{.PackageName}} import config
+
+norns = Norns(config.NORNS_URL, api_key=config.NORNS_API_KEY)
+
+result = norns.send_message("{{.Name}}", "Hello! What can you do?")
+print(f"Run {result.run_id}: {result.status}")
