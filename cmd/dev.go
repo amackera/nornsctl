@@ -101,7 +101,8 @@ func runDevCmd(background bool) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		return dev.Up(state, background, rootCmd.Version)
+		port, _ := cmd.Flags().GetString("port")
+		return dev.Up(state, background, rootCmd.Version, port)
 	}
 }
 
@@ -112,4 +113,6 @@ func init() {
 	devCmd.AddCommand(devStatusCmd)
 	devCmd.AddCommand(devLogsCmd)
 	devCmd.AddCommand(devResetCmd)
+
+	devCmd.PersistentFlags().String("port", "4000", "Port for the Norns server")
 }

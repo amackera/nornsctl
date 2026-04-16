@@ -17,7 +17,7 @@ const (
 	VolumeName    = "nornsctl-dev-postgres-data"
 	PostgresImage = "postgres:16-alpine"
 	NornsImage    = "ghcr.io/amackera/norns:main"
-	NornsPort     = "4000"
+	DefaultPort   = "4000"
 	PostgresUser  = "norns"
 	PostgresPass  = "norns"
 	PostgresDB    = "norns_dev"
@@ -25,9 +25,19 @@ const (
 
 // Up starts the dev server. If background is false, streams logs and stops
 // containers on Ctrl-C.
-func Up(state *State, background bool, version string) error {
-	// Check port 4000 is free
-	if err := checkPort(NornsPort); err != nil {
+func Up(state *State, background bool, version string, port string) error {
+	if port == "" {
+		port = DefaultPort
+	}
+
+	// Check port is free
+	if err := checkPort(port); err != nil {
+		return err
+	}
+
+	// Update state URL to reflect the port
+	state.URL = fmt.Sprintf("http://localhost:%s", port)
+	if err := SaveState(state); err != nil {
 		return err
 	}
 
@@ -96,7 +106,7 @@ func Up(state *State, background bool, version string) error {
 			"--name", NornsName,
 			"--network", NetworkName,
 			"--restart", restartPolicy,
-			"-p", NornsPort + ":4000",
+			"-p", port + ":4000",
 			"-e", "DATABASE_URL=" + databaseURL,
 			"-e", "SECRET_KEY_BASE=" + state.SecretKeyBase,
 			"-e", "NORNS_DEFAULT_TENANT_KEY=" + state.APIKey,
@@ -111,12 +121,12 @@ func Up(state *State, background bool, version string) error {
 
 	// Wait for Norns
 	fmt.Print("Waiting for Norns...")
-	if err := waitForNorns(); err != nil {
+	if err := waitForNorns(port); err != nil {
 		return err
 	}
 	fmt.Println(" ready")
 
-	fmt.Printf("\n  Norns is running at http://localhost:%s\n", NornsPort)
+	fmt.Printf("\n  Norns is running at http://localhost:%s\n", port)
 	fmt.Printf("  API key: %s\n\n", state.APIKey)
 
 	MaybeFirstRunPing(state, version)
@@ -190,7 +200,7 @@ func StatusInfo() {
 func checkPort(port string) error {
 	ln, err := net.Listen("tcp", ":"+port)
 	if err != nil {
-		return fmt.Errorf("port %s is already in use. Stop whatever is using it, or set a different port with --port", port)
+		return fmt.Errorf("port %s is already in use. Stop whatever is using it, or use --port to pick a different one", port)
 	}
 	ln.Close()
 	return nil
@@ -208,8 +218,8 @@ func waitForPostgres() error {
 	return fmt.Errorf(" postgres did not become healthy in time")
 }
 
-func waitForNorns() error {
-	url := fmt.Sprintf("http://localhost:%s/api/v1/agents", NornsPort)
+func waitForNorns(port string) error {
+	url := fmt.Sprintf("http://localhost:%s/api/v1/agents", port)
 	httpClient := &http.Client{Timeout: 2 * time.Second}
 
 	for i := 0; i < 60; i++ {
