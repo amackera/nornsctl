@@ -109,14 +109,20 @@ func Run(cfg Config) error {
 		fmt.Printf("\n  Next steps:\n")
 		fmt.Printf("    cd %s\n", cfg.OutputDir)
 		fmt.Printf("    uv sync\n")
-		fmt.Printf("    uv run %s-worker\n", cfg.Name)
+		fmt.Printf("    uv run %s-worker\n\n", cfg.Name)
+		fmt.Printf("  Then in another terminal, send a test message:\n")
+		fmt.Printf("    cd %s\n", cfg.OutputDir)
+		fmt.Printf("    uv run %s-client\n", cfg.Name)
 	} else {
 		fmt.Printf("\n  Tip: run `nornsctl dev` to start a local server and auto-configure\n")
 		fmt.Printf("\n  Next steps:\n")
 		fmt.Printf("    cd %s\n", cfg.OutputDir)
 		fmt.Printf("    uv sync\n")
 		fmt.Printf("    cp .env.example .env   # fill in your API keys\n")
-		fmt.Printf("    uv run %s-worker\n", cfg.Name)
+		fmt.Printf("    uv run %s-worker\n\n", cfg.Name)
+		fmt.Printf("  Then in another terminal, send a test message:\n")
+		fmt.Printf("    cd %s\n", cfg.OutputDir)
+		fmt.Printf("    uv run %s-client\n", cfg.Name)
 	}
 	fmt.Println()
 
