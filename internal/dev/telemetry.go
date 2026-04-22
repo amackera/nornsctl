@@ -32,7 +32,7 @@ func MaybeFirstRunPing(state *State, version string) {
 	}
 }
 
-const telemetryURL = "https://norns.mackeracher.com/api/v1/telemetry/first-run"
+const telemetryURL = "https://cloud.nornscode.com/api/v1/telemetry/first-run"
 
 func sendPing(version string) {
 	body, _ := json.Marshal(map[string]string{
